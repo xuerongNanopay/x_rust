@@ -7,8 +7,7 @@ mod tests {
     use std::path::{Path, PathBuf};
     use std::time::SystemTime;
 
-    const MB_SIZE: usize = 1024*1024;
-    const FD_SIZE_MB: usize = 5;
+    const SIZE_IN_BYTE: usize = 1024*1024;
     const TMP_DIR: &str = "./tmp";
 
     fn is_directory_exist(path: &str) -> bool {
@@ -53,8 +52,8 @@ mod tests {
 
     fn fill_fd() -> File {
         let mut fd = init_fd();
-        let bytes: [u8; MB_SIZE] = [48u8; MB_SIZE];
-        for _ in 0..FD_SIZE_MB*10 {
+        let bytes: [u8; SIZE_IN_BYTE] = [48u8; SIZE_IN_BYTE];
+        for _ in 0..10 {
             fd.write(&bytes).unwrap();
         }
         fd.seek(SeekFrom::Start(0)).unwrap();
@@ -66,25 +65,21 @@ mod tests {
         let mut fd = fill_fd();
 
         let start = SystemTime::now();
-        for _ in 0..FD_SIZE_MB*MB_SIZE {
+        for _ in 0..SIZE_IN_BYTE {
             fd.write(b"HelloWorld").unwrap();
             fd.flush().unwrap()
         }
-        println!("Use {} seconds", start.elapsed().unwrap().as_secs());
+        println!("Elapsed: {}", start.elapsed().unwrap().as_millis());
 
     }
 
     #[test]
     fn random_io() {
-        // let mut fds = init_fd();
+        let mut fds = init_fd();
+        let pos: [u64; SIZE_IN_BYTE] = [0; SIZE_IN_BYTE];
 
-        // let start = SystemTime::now();
-        // for _ in 0..4000000 {
-        //     for fd in fds.iter_mut() {
-        //         fd.write(b"Hello, rrrr").unwrap();
-        //         fd.flush().unwrap()
-        //     }
-        // }
-        // println!("Use {} seconds", start.elapsed().unwrap().as_secs());
+        let start = SystemTime::now();
+        
+        println!("Elapsed: {}", start.elapsed().unwrap().as_millis());
     }
 }
