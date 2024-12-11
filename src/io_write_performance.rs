@@ -6,8 +6,10 @@ mod tests {
     use std::fs::File;
     use std::path::{Path, PathBuf};
     use std::time::SystemTime;
+    use rand::{seq::SliceRandom, thread_rng};
 
-    const SIZE_IN_BYTE: usize = 1024*1024;
+    const SIZE_IN_BYTE: usize = 250*1024;
+    // const SIZE_IN_BYTE: usize = 10;
     const TMP_DIR: &str = "./tmp";
 
     fn is_directory_exist(path: &str) -> bool {
@@ -75,11 +77,20 @@ mod tests {
 
     #[test]
     fn random_io() {
-        let mut fds = init_fd();
-        let pos: [u64; SIZE_IN_BYTE] = [0; SIZE_IN_BYTE];
-
-        let start = SystemTime::now();
+        let mut fd = init_fd();
+        // let pos: [u64; SIZE_IN_BYTE] = [0; SIZE_IN_BYTE];
+        let mut pos: Vec<u64> = (0..(SIZE_IN_BYTE as u64)).collect();
+        pos.shuffle(&mut thread_rng());
+        for p in pos.iter_mut() {
+            *p = *p * 10u64;
+        }
         
+        let start = SystemTime::now();
+        for p in pos.iter() {
+            fd.seek(SeekFrom::Start(*p)).unwrap();
+            fd.write(b"HelloWorld").unwrap();
+            fd.flush().unwrap()
+        }
         println!("Elapsed: {}", start.elapsed().unwrap().as_millis());
     }
 }
