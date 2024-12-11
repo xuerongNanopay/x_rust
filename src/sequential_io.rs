@@ -1,6 +1,7 @@
-#[warn(dead_code)]
-fn aaa(left: u64, right: u64) -> u64 {
-    left + right
+use std::path::Path;
+
+fn is_directory_exist(path: &str) -> bool {
+    return Path::new(path).exists()
 }
 
 #[cfg(test)]
@@ -9,7 +10,6 @@ mod tests {
 
     #[test]
     fn sequential_io() {
-        let result = aaa(2, 2);
-        assert_eq!(result, 4);
+        println!("{}", is_directory_exist("./target"));
     }
 }
